@@ -2,12 +2,12 @@
 .\"     Title: modbus_send_raw_request
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 07/19/2011
+.\"      Date: 01/16/2012
 .\"    Manual: Libmodbus Manual
-.\"    Source: libmodbus 3.0.1
+.\"    Source: libmodbus 3.0.2
 .\"  Language: English
 .\"
-.TH "MODBUS_SEND_RAW_REQU" "3" "07/19/2011" "libmodbus 3\&.0\&.1" "Libmodbus Manual"
+.TH "MODBUS_SEND_RAW_REQU" "3" "01/16/2012" "libmodbus 3\&.0\&.2" "Libmodbus Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -31,7 +31,7 @@
 modbus_send_raw_request \- send a raw request
 .SH "SYNOPSIS"
 .sp
-\fBint modbus_send_raw_request(*modbus_t \fR\fB\fIctx\fR\fR\fB, uint8_t *\fR\fB\fIraw_req, int \*(Aqraw_req_length\fR\fR\fB);\fR
+\fBint modbus_send_raw_request(modbus_t *\fR\fB\fIctx\fR\fR\fB, uint8_t *\fR\fB\fIraw_req, int \*(Aqraw_req_length\fR\fR\fB);\fR
 .SH "DESCRIPTION"
 .sp
 The \fImodbus_send_raw_request()\fR function shall send a request via the socket of the context \fIctx\fR\&. This function must be used for debugging purposes because you have to take care to make a valid request by hand\&. The function only adds to the message, the header or CRC of the selected backend, so \fIraw_req\fR must start and contain at least a slave/unit identifier and a function code\&. This function can be used to send request not handled by the library\&.

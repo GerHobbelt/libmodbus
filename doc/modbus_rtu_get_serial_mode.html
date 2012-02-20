@@ -414,7 +414,7 @@ modbus_rtu_get_serial_mode(3) Manual Page
 </div>
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><strong>int modbus_rtu_get_serial_mode(*modbus_t <em>ctx</em>);</strong></p></div>
+<div class="paragraph"><p><strong>int modbus_rtu_get_serial_mode(modbus_t *<em>ctx</em>);</strong></p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
@@ -447,7 +447,8 @@ the serial line is set for RS485 communication. EIA-485,
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>This function is only available on Linux kernels 2.6.28 onwards.</p></div>
+<div class="paragraph"><p>This function is only available on Linux kernels 2.6.28 onwards and can only be
+used with a context using a RTU backend.</p></div>
 </div>
 <h2 id="_return_value">RETURN VALUE</h2>
 <div class="sectionbody">
@@ -477,8 +478,8 @@ The current libmodbus backend is not RTU.
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-libmodbus 3.0.1<br />
-Last updated 2011-07-12 00:15:54 CEST
+libmodbus 3.0.2<br />
+Last updated 2011-09-09 22:29:57 CEST
 </div>
 </div>
 </body>

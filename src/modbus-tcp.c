@@ -68,7 +68,7 @@ static int _modbus_tcp_init_win32(void)
     /* Initialise Windows Socket API */
     WSADATA wsaData;
 
-    if (WSAStartup(MAKEWORD(2, 0), &wsaData) != 0) {
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         fprintf(stderr, "WSAStartup() returned error code %d\n",
                 (unsigned int)GetLastError());
         errno = EIO;
@@ -549,7 +549,7 @@ int modbus_tcp_pi_accept(modbus_t *ctx, int *socket)
     }
 
     if (ctx->debug) {
-        printf("The client connection is accepted.");
+        printf("The client connection is accepted.\n");
     }
 
     return ctx->s;

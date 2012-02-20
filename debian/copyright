@@ -9,7 +9,7 @@ Upstream Author:
 
 Copyright:
 
-    <Copyright (C) 2001-2011 Stéphane Raimbault>
+    <Copyright (C) 2001-2012 Stéphane Raimbault>
 
 License for libmodbus:
 
@@ -50,8 +50,8 @@ Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
 
 The Debian packaging is:
 
-    Copyright (C) 2008-20011 Stéphane Raimbault <stephane.raimbault@gmail.com>
-    Copyright (C) 2011 Ivo De Decker <Ivo.DeDecker@UGent.be>
+    Copyright (C) 2008-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
+    Copyright (C) 2011-2012 Ivo De Decker <Ivo.DeDecker@UGent.be>
 
 and is licensed under the LGPL version 2.1 or later, see
 "/usr/share/common-licenses/LGPL-2.1".

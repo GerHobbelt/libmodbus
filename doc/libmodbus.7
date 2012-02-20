@@ -2,12 +2,12 @@
 .\"     Title: libmodbus
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 07/19/2011
+.\"      Date: 01/25/2012
 .\"    Manual: Libmodbus Manual
-.\"    Source: libmodbus 3.0.1
+.\"    Source: libmodbus 3.0.2
 .\"  Language: English
 .\"
-.TH "LIBMODBUS" "7" "07/19/2011" "libmodbus 3\&.0\&.1" "Libmodbus Manual"
+.TH "LIBMODBUS" "7" "01/25/2012" "libmodbus 3\&.0\&.2" "Libmodbus Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,7 +28,7 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-libmodbus \- fast and portable Modbus library
+libmodbus \- a fast and portable Modbus library
 .SH "SYNOPSIS"
 .sp
 \fB#include <modbus\&.h>\fR
@@ -43,7 +43,7 @@ libmodbus provides an abstraction of the lower communication layers and offers t
 This documentation presents an overview of libmodbus concepts, describes how libmodbus abstracts Modbus communication with different hardware and platforms and provides a reference manual for the functions provided by the libmodbus library\&.
 .SS "Contexts"
 .sp
-The Modbus protocol contains many variants (eg\&. serial RTU or Ehternet TCP), to ease the implementation of a variant, the library was designed to use a backend for each variant\&. The backends are also a convenient way to fulfill other requirements (eg\&. real\-time operations)\&. Each backend offers a specific function to create a new \fImodbus_t\fR context\&. The \fImodbus_t\fR context is an opaque structure containing all necessary information to etablish a connection with others Modbus devices according to the selected variant\&.
+The Modbus protocol contains many variants (eg\&. serial RTU or Ehternet TCP), to ease the implementation of a variant, the library was designed to use a backend for each variant\&. The backends are also a convenient way to fulfill other requirements (eg\&. real\-time operations)\&. Each backend offers a specific function to create a new \fImodbus_t\fR context\&. The \fImodbus_t\fR context is an opaque structure containing all necessary information to establish a connection with others Modbus devices according to the selected variant\&.
 .sp
 You can choose the best context for your needs among:
 .sp
@@ -191,7 +191,7 @@ Read data
 \fBmodbus_read_input_bits\fR(3)
 \fBmodbus_read_registers\fR(3)
 \fBmodbus_read_input_registers\fR(3)
-libkmb:modbus_report_slave_id[3]
+\fBmodbus_report_slave_id\fR(3)
 .RE
 .PP
 Write data
