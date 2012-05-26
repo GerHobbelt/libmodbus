@@ -1,5 +1,5 @@
 Name: libmodbus
-Version: 3.0.2
+Version: 3.0.3
 Release: 1%{?dist}
 Summary: A Modbus library
 Group: Applications/System
@@ -61,6 +61,9 @@ rm -f %{buildroot}/%{_libdir}/*.la
 %{_mandir}/man3/*.3.*
 
 %changelog
+* Fri May 25 2012 Stéphane Raimbault <stephane.raimbault@gmail.com> - 3.0.3-1
+- new upstream release
+
 * Mon Jan 16 2012 Stéphane Raimbault <stephane.raimbault@gmail.com> - 3.0.2-1
 - new upstream release
 

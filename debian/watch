@@ -1,0 +1,2 @@
+version=3
+https://github.com/stephane/libmodbus/tags .*/tarball/v(\d[\d\.]+)

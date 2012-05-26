@@ -1,3 +1,14 @@
+libmodbus (3.0.3-1) unstable; urgency=low
+
+  * Acknowledge NMU, thanks to Roland Stigge and Josef Holzmayr
+  * New upstream release
+  * Update standards-version to 3.9.3 (no changes) 
+  * Move to debhelper compatibility level 9
+  * Add symbols file 
+  * Add watch file 
+
+ -- Ivo De Decker <ivo.dedecker@ugent.be>  Sat, 26 May 2012 14:19:39 +0200
+
 libmodbus (3.0.2-1.1) unstable; urgency=low
 
   * Non-maintainer upload.
