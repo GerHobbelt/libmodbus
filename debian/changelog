@@ -1,3 +1,11 @@
+libmodbus (3.0.5-1) unstable; urgency=low
+
+  * New upstream release
+  * Refresh 01-add-length-checks.patch, as most changes have been superseded
+    upstream
+
+ -- Ivo De Decker <ivo.dedecker@ugent.be>  Mon, 07 Oct 2013 20:50:25 +0200
+
 libmodbus (3.0.4-1) unstable; urgency=low
 
   * New upstream release 
