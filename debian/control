@@ -1,7 +1,7 @@
 Source: libmodbus
 Priority: extra
 Maintainer: Ivo De Decker <ivodd@debian.org>
-Standards-Version: 3.9.6
+Standards-Version: 3.9.8
 Section: libs
 Build-Depends: debhelper (>= 9), asciidoc, xmlto, dh-autoreconf
 Homepage: http://libmodbus.org/
