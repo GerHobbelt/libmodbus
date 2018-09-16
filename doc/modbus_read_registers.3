@@ -2,12 +2,12 @@
 .\"     Title: modbus_read_registers
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 07/19/2011
+.\"      Date: 01/16/2012
 .\"    Manual: Libmodbus Manual
-.\"    Source: libmodbus 3.0.1
+.\"    Source: libmodbus 3.0.2
 .\"  Language: English
 .\"
-.TH "MODBUS_READ_REGISTER" "3" "07/19/2011" "libmodbus 3\&.0\&.1" "Libmodbus Manual"
+.TH "MODBUS_READ_REGISTER" "3" "01/16/2012" "libmodbus 3\&.0\&.2" "Libmodbus Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -48,6 +48,40 @@ EMBMDATA
 .RS 4
 Too many registers requested
 .RE
+.SH "EXAMPLE"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+modbus_t *ctx;
+uint16_t tab_reg[64];
+int rc;
+int i;
+
+ctx = modbus_new_tcp("127\&.0\&.0\&.1", 1502);
+if (modbus_connect(ctx) == \-1) {
+    fprintf(stderr, "Connection failed: %s\en", modbus_strerror(errno));
+    modbus_free(ctx);
+    return \-1;
+}
+
+rc = modbus_read_registers(ctx, 0, 10, tab_reg);
+if (rc == \-1) {
+    fprintf(stderr, "%s\en", modbus_strerror(errno));
+    return \-1;
+}
+
+for (i=0; i < rc; i++) {
+    printf("reg[%d]=%d (0x%X)\en", i, tab_reg[i], tab_reg[i]);
+}
+
+modbus_close(ctx);
+modbus_free(ctx);
+.fi
+.if n \{\
+.RE
+.\}
 .SH "SEE ALSO"
 .sp
 \fBmodbus_write_register\fR(3) \fBmodbus_write_registers\fR(3)

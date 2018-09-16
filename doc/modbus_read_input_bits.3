@@ -2,12 +2,12 @@
 .\"     Title: modbus_read_input_bits
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 07/19/2011
+.\"      Date: 01/16/2012
 .\"    Manual: Libmodbus Manual
-.\"    Source: libmodbus 3.0.1
+.\"    Source: libmodbus 3.0.2
 .\"  Language: English
 .\"
-.TH "MODBUS_READ_INPUT_BI" "3" "07/19/2011" "libmodbus 3\&.0\&.1" "Libmodbus Manual"
+.TH "MODBUS_READ_INPUT_BI" "3" "01/16/2012" "libmodbus 3\&.0\&.2" "Libmodbus Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -38,7 +38,7 @@ The \fImodbus_read_input_bits()\fR function shall read the content of the \fInb\
 .sp
 You must take care to allocate enough memory to store the results in \fIdest\fR (at least \fInb\fR * sizeof(uint8_t))\&.
 .sp
-The function uses the Modbus function code 0x03 (read input status)\&.
+The function uses the Modbus function code 0x02 (read input status)\&.
 .SH "RETURN VALUE"
 .sp
 The \fImodbus_read_input_status()\fR function shall return the number of read input status if successful\&. Otherwise it shall return \-1 and set errno\&.

@@ -2,12 +2,12 @@
 .\"     Title: modbus_set_error_recovery
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 07/19/2011
+.\"      Date: 01/16/2012
 .\"    Manual: Libmodbus Manual
-.\"    Source: libmodbus 3.0.1
+.\"    Source: libmodbus 3.0.2
 .\"  Language: English
 .\"
-.TH "MODBUS_SET_ERROR_REC" "3" "07/19/2011" "libmodbus 3\&.0\&.1" "Libmodbus Manual"
+.TH "MODBUS_SET_ERROR_REC" "3" "01/16/2012" "libmodbus 3\&.0\&.2" "Libmodbus Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -34,7 +34,7 @@ modbus_set_error_recovery \- set the error recovery mode
 \fBint modbus_set_error_recovery(modbus_t *\fR\fB\fIctx\fR\fR\fB, modbus_error_recovery_mode \fR\fB\fIerror_recovery\fR\fR\fB);\fR
 .SH "DESCRIPTION"
 .sp
-The \fImodbus_set_error_recovery()\fR function shall set the error recovery mode to apply when the connection fails or the date received are not expected\&.
+The \fImodbus_set_error_recovery()\fR function shall set the error recovery mode to apply when the connection fails or the byte received is not expected\&. The argument \fIerror_recovery\fR may be bitwise\-or\(cqed with zero or more of the following constants\&.
 .sp
 By default there is no error recovery (\fIMODBUS_ERROR_RECOVERY_NONE\fR) so the application is responsible for controlling the error values returned by libmodbus functions and for handling them if necessary\&.
 .sp

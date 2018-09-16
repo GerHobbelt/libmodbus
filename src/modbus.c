@@ -440,7 +440,7 @@ static int receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
             }
         }
 
-        if (length_to_read > 0) {
+        if (length_to_read > 0 && ctx->byte_timeout.tv_sec != -1) {
             /* If there is no character in the buffer, the allowed timeout
                interval between two consecutive bytes is defined by
                byte_timeout */
@@ -1562,6 +1562,10 @@ modbus_mapping_t* modbus_mapping_new(int nb_bits, int nb_input_bits,
 /* Frees the 4 arrays */
 void modbus_mapping_free(modbus_mapping_t *mb_mapping)
 {
+    if (mb_mapping != NULL) {
+        return;
+    }
+
     free(mb_mapping->tab_input_registers);
     free(mb_mapping->tab_registers);
     free(mb_mapping->tab_input_bits);

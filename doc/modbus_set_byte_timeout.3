@@ -2,12 +2,12 @@
 .\"     Title: modbus_set_byte_timeout
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 07/19/2011
+.\"      Date: 01/16/2012
 .\"    Manual: Libmodbus Manual
-.\"    Source: libmodbus 3.0.1
+.\"    Source: libmodbus 3.0.2
 .\"  Language: English
 .\"
-.TH "MODBUS_SET_BYTE_TIME" "3" "07/19/2011" "libmodbus 3\&.0\&.1" "Libmodbus Manual"
+.TH "MODBUS_SET_BYTE_TIME" "3" "01/16/2012" "libmodbus 3\&.0\&.2" "Libmodbus Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -31,10 +31,12 @@
 modbus_set_byte_timeout \- set timeout between bytes
 .SH "SYNOPSIS"
 .sp
-\fBvoid modbus_set_byte_timeout(*modbus_t \fR\fB\fIctx\fR\fR\fB, struct timeval *\fR\fB\fItimeout\fR\fR\fB);\fR
+\fBvoid modbus_set_byte_timeout(modbus_t *\fR\fB\fIctx\fR\fR\fB, struct timeval *\fR\fB\fItimeout\fR\fR\fB);\fR
 .SH "DESCRIPTION"
 .sp
 The \fImodbus_set_byte_timeout()\fR function shall set the timeout interval between two consecutive bytes of the same message\&. If the delay between is longer than the given timeout, an error will be raised\&.
+.sp
+If the timeout value has a tv_sec of \-1 then this timeout will not be used at all\&. This results in modbus_set_response_timeout governing the entire timeout duration of an operation\&.
 .SH "RETURN VALUE"
 .sp
 There is no return values\&.

@@ -414,13 +414,16 @@ modbus_set_byte_timeout(3) Manual Page
 </div>
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><strong>void modbus_set_byte_timeout(*modbus_t <em>ctx</em>, struct timeval *<em>timeout</em>);</strong></p></div>
+<div class="paragraph"><p><strong>void modbus_set_byte_timeout(modbus_t *<em>ctx</em>, struct timeval *<em>timeout</em>);</strong></p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The <em>modbus_set_byte_timeout()</em> function shall set the timeout interval between
 two consecutive bytes of the same message. If the delay between is longer than
 the given timeout, an error will be raised.</p></div>
+<div class="paragraph"><p>If the timeout value has a tv_sec of -1 then this timeout will not be used at
+all. This results in modbus_set_response_timeout governing the entire timeout
+duration of an operation.</p></div>
 </div>
 <h2 id="_return_value">RETURN VALUE</h2>
 <div class="sectionbody">
@@ -441,8 +444,8 @@ the given timeout, an error will be raised.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-libmodbus 3.0.1<br />
-Last updated 2011-07-12 00:15:54 CEST
+libmodbus 3.0.2<br />
+Last updated 2012-01-16 22:43:09 CEST
 </div>
 </div>
 </body>

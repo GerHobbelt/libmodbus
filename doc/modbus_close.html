@@ -414,7 +414,7 @@ modbus_close(3) Manual Page
 </div>
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><strong>int modbus_close(*modbus_t <em>ctx</em>);</strong></p></div>
+<div class="paragraph"><p><strong>void modbus_close(modbus_t *<em>ctx</em>);</strong></p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
@@ -423,8 +423,7 @@ backend set in the context.</p></div>
 </div>
 <h2 id="_return_value">RETURN VALUE</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The <em>modbus_close()</em> function shall return 0 if successful. Otherwise it shall
-return -1 and set errno.</p></div>
+<div class="paragraph"><p>There is no return value.</p></div>
 </div>
 <h2 id="_example">EXAMPLE</h2>
 <div class="sectionbody">
@@ -458,8 +457,8 @@ ctx <span style="color: #990000">=</span> <span style="font-weight: bold"><span 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-libmodbus 3.0.1<br />
-Last updated 2011-07-12 00:15:54 CEST
+libmodbus 3.0.2<br />
+Last updated 2011-09-09 22:29:56 CEST
 </div>
 </div>
 </body>

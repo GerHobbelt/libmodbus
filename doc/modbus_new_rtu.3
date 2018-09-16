@@ -2,12 +2,12 @@
 .\"     Title: modbus_new_rtu
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 07/19/2011
+.\"      Date: 01/16/2012
 .\"    Manual: Libmodbus Manual
-.\"    Source: libmodbus 3.0.1
+.\"    Source: libmodbus 3.0.2
 .\"  Language: English
 .\"
-.TH "MODBUS_NEW_RTU" "3" "07/19/2011" "libmodbus 3\&.0\&.1" "Libmodbus Manual"
+.TH "MODBUS_NEW_RTU" "3" "01/16/2012" "libmodbus 3\&.0\&.2" "Libmodbus Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -31,7 +31,7 @@
 modbus_new_rtu \- create a libmodbus context for RTU
 .SH "SYNOPSIS"
 .sp
-\fBmodbus_t modbus_new_rtu(const char *\fR\fB\fIdevice\fR\fR\fB, int \fR\fB\fIbaud\fR\fR\fB, char \fR\fB\fIparity\fR\fR\fB, int \fR\fB\fIdata_bit\fR\fR\fB, int \fR\fB\fIstop_bit\fR\fR\fB);\fR
+\fBmodbus_t *modbus_new_rtu(const char *\fR\fB\fIdevice\fR\fR\fB, int \fR\fB\fIbaud\fR\fR\fB, char \fR\fB\fIparity\fR\fR\fB, int \fR\fB\fIdata_bit\fR\fR\fB, int \fR\fB\fIstop_bit\fR\fR\fB);\fR
 .SH "DESCRIPTION"
 .sp
 The \fImodbus_new_rtu()\fR function shall allocate and initialize a modbus_t structure to communicate in RTU mode on a serial line\&.

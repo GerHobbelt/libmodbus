@@ -419,7 +419,9 @@ modbus_set_error_recovery(3) Manual Page
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The <em>modbus_set_error_recovery()</em> function shall set the error recovery mode to
-apply when the connection fails or the date received are not expected.</p></div>
+apply when the connection fails or the byte received is not expected. The
+argument <em>error_recovery</em> may be bitwise-or&#8217;ed with zero or more of the
+following constants.</p></div>
 <div class="paragraph"><p>By default there is no error recovery (<em>MODBUS_ERROR_RECOVERY_NONE</em>) so the
 application is responsible for controlling the error values returned by
 libmodbus functions and for handling them if necessary.</p></div>
@@ -477,8 +479,8 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-libmodbus 3.0.1<br />
-Last updated 2011-07-12 22:51:23 CEST
+libmodbus 3.0.2<br />
+Last updated 2011-09-09 22:29:57 CEST
 </div>
 </div>
 </body>

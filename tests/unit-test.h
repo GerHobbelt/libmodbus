@@ -1,5 +1,6 @@
+/* tests/unit-test.h.  Generated from unit-test.h.in by configure.  */
 /*
- * Copyright © 2008-2010 Stéphane Raimbault <stephane.raimbault@gmail.com>
+ * Copyright © 2008-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +19,9 @@
 #ifndef _UNIT_TEST_H_
 #define _UNIT_TEST_H_
 
-#include <config.h>
+/* Constants defined by configure.ac */
+#define HAVE_INTTYPES_H 1
+#define HAVE_STDINT_H 1
 
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>

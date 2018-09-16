@@ -2,12 +2,12 @@
 .\"     Title: modbus_reply_exception
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 07/19/2011
+.\"      Date: 01/16/2012
 .\"    Manual: Libmodbus Manual
-.\"    Source: libmodbus 3.0.1
+.\"    Source: libmodbus 3.0.2
 .\"  Language: English
 .\"
-.TH "MODBUS_REPLY_EXCEPTI" "3" "07/19/2011" "libmodbus 3\&.0\&.1" "Libmodbus Manual"
+.TH "MODBUS_REPLY_EXCEPTI" "3" "01/16/2012" "libmodbus 3\&.0\&.2" "Libmodbus Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -165,7 +165,7 @@ The initial request \fIreq\fR is required to build a valid response\&.
 The \fImodbus_reply_exception()\fR function shall return the length of the response sent if successful\&. Otherwise it shall return \-1 and set errno\&.
 .SH "ERRORS"
 .PP
-EINVAL
+\fBEINVAL\fR
 .RS 4
 The exception code is invalid
 .RE
