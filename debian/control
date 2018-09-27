@@ -5,6 +5,8 @@ Standards-Version: 4.2.1
 Section: libs
 Build-Depends: debhelper (>= 11), asciidoc, xmlto
 Homepage: http://libmodbus.org/
+Vcs-Git: https://salsa.debian.org/debian/libmodbus.git
+Vcs-Browser: https://salsa.debian.org/debian/libmodbus
 
 Package: libmodbus5
 Architecture: any
@@ -28,4 +30,3 @@ Description: development files for the Modbus protocol library
  Ethernet connection.
  .
  This package contains the development files.
-
