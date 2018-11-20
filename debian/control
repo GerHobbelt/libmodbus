@@ -1,6 +1,7 @@
 Source: libmodbus
 Priority: optional
-Maintainer: Ivo De Decker <ivodd@debian.org>
+Maintainer: SZ Lin (林上智) <szlin@debian.org>
+Uploaders: Ivo De Decker <ivodd@debian.org>
 Standards-Version: 4.2.1
 Section: libs
 Build-Depends: debhelper (>= 11), asciidoc, xmlto
