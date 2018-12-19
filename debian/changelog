@@ -1,3 +1,11 @@
+libmodbus (3.1.4-2) unstable; urgency=medium
+
+  * Fix float endianness issue on big endian arch (Closes: #916345)
+  * d/control:
+    - Add psmisc to Build-Depends
+
+ -- SZ Lin (林上智) <szlin@debian.org>  Wed, 19 Dec 2018 11:14:47 +0800
+
 libmodbus (3.1.4-1) unstable; urgency=medium
 
   * Import new upstream release (Closes: #842534)
