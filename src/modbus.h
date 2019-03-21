@@ -154,7 +154,7 @@ extern const unsigned int libmodbus_version_micro;
 
 typedef struct _modbus modbus_t;
 
-typedef struct _modbus_mapping_t {
+typedef struct {
     int nb_bits;
     int start_bits;
     int nb_input_bits;
@@ -177,7 +177,6 @@ typedef enum
 } modbus_error_recovery_mode;
 
 MODBUS_API int modbus_set_slave(modbus_t* ctx, int slave);
-MODBUS_API int modbus_get_slave(modbus_t* ctx);
 MODBUS_API int modbus_set_error_recovery(modbus_t *ctx, modbus_error_recovery_mode error_recovery);
 MODBUS_API int modbus_set_socket(modbus_t *ctx, int s);
 MODBUS_API int modbus_get_socket(modbus_t *ctx);
@@ -187,9 +186,6 @@ MODBUS_API int modbus_set_response_timeout(modbus_t *ctx, uint32_t to_sec, uint3
 
 MODBUS_API int modbus_get_byte_timeout(modbus_t *ctx, uint32_t *to_sec, uint32_t *to_usec);
 MODBUS_API int modbus_set_byte_timeout(modbus_t *ctx, uint32_t to_sec, uint32_t to_usec);
-
-MODBUS_API int modbus_get_indication_timeout(modbus_t *ctx, uint32_t *to_sec, uint32_t *to_usec);
-MODBUS_API int modbus_set_indication_timeout(modbus_t *ctx, uint32_t to_sec, uint32_t to_usec);
 
 MODBUS_API int modbus_get_header_length(modbus_t *ctx);
 
@@ -224,7 +220,8 @@ MODBUS_API modbus_mapping_t* modbus_mapping_new_start_address(
     unsigned int start_input_registers, unsigned int nb_input_registers);
 
 MODBUS_API modbus_mapping_t* modbus_mapping_new(int nb_bits, int nb_input_bits,
-                                                int nb_registers, int nb_input_registers);
+		int nb_registers, int nb_input_registers);
+
 MODBUS_API void modbus_mapping_free(modbus_mapping_t *mb_mapping);
 
 MODBUS_API int modbus_send_raw_request(modbus_t *ctx, uint8_t *raw_req, int raw_req_length);
@@ -235,9 +232,14 @@ MODBUS_API int modbus_receive_confirmation(modbus_t *ctx, uint8_t *rsp);
 
 MODBUS_API int modbus_reply(modbus_t *ctx, const uint8_t *req,
                             int req_length, modbus_mapping_t *mb_mapping);
+
 MODBUS_API int modbus_reply_exception(modbus_t *ctx, const uint8_t *req,
                                       unsigned int exception_code);
 
+MODBUS_API int modbus_proxy(modbus_t* master_ctx, modbus_t* slave_ctx, uint8_t* master_req,
+		int master_req_length);
+
+MODBUS_API int modbus_receive_raw_confirmation(modbus_t *ctx, uint8_t *rsp);
 /**
  * UTILS FUNCTIONS
  **/

@@ -349,7 +349,7 @@ int _modbus_receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
 
     if (ctx->debug) {
         if (msg_type == MSG_INDICATION) {
-            printf("Waiting for an indication...\n");
+            printf("Waiting for a indication...\n");
         } else {
             printf("Waiting for a confirmation...\n");
         }
@@ -368,15 +368,7 @@ int _modbus_receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
     if (msg_type == MSG_INDICATION) {
         /* Wait for a message, we don't know when the message will be
          * received */
-        if (ctx->indication_timeout.tv_sec == 0 && ctx->indication_timeout.tv_usec == 0) {
-            /* By default, the indication timeout isn't set */
-            p_tv = NULL;
-        } else {
-            /* Wait for an indication (name of a received request by a server, see schema) */
-            tv.tv_sec = ctx->indication_timeout.tv_sec;
-            tv.tv_usec = ctx->indication_timeout.tv_usec;
-            p_tv = &tv;
-        }
+        p_tv = NULL;
     } else {
         tv.tv_sec = ctx->response_timeout.tv_sec;
         tv.tv_usec = ctx->response_timeout.tv_usec;
@@ -996,8 +988,7 @@ int modbus_reply(modbus_t *ctx, const uint8_t *req,
     }
 
     /* Suppress any responses when the request was a broadcast */
-    return (ctx->backend->backend_type == _MODBUS_BACKEND_TYPE_RTU &&
-            slave == MODBUS_BROADCAST_ADDRESS) ? 0 : send_msg(ctx, rsp, rsp_length);
+    return (slave == MODBUS_BROADCAST_ADDRESS) ? 0 : send_msg(ctx, rsp, rsp_length);
 }
 
 int modbus_reply_exception(modbus_t *ctx, const uint8_t *req,
@@ -1021,7 +1012,7 @@ int modbus_reply_exception(modbus_t *ctx, const uint8_t *req,
     function = req[offset];
 
     sft.slave = slave;
-    sft.function = function + 0x80;
+    sft.function = function + 0x80;;
     sft.t_id = ctx->backend->prepare_response_tid(req, &dummy_length);
     rsp_length = ctx->backend->build_response_basis(&sft, rsp);
 
@@ -1573,9 +1564,6 @@ void _modbus_init_common(modbus_t *ctx)
 
     ctx->byte_timeout.tv_sec = 0;
     ctx->byte_timeout.tv_usec = _BYTE_TIMEOUT;
-
-    ctx->indication_timeout.tv_sec = 0;
-    ctx->indication_timeout.tv_usec = 0;
 }
 
 /* Define the slave number */
@@ -1587,16 +1575,6 @@ int modbus_set_slave(modbus_t *ctx, int slave)
     }
 
     return ctx->backend->set_slave(ctx, slave);
-}
-
-int modbus_get_slave(modbus_t *ctx)
-{
-    if (ctx == NULL) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    return ctx->slave;
 }
 
 int modbus_set_error_recovery(modbus_t *ctx,
@@ -1685,32 +1663,6 @@ int modbus_set_byte_timeout(modbus_t *ctx, uint32_t to_sec, uint32_t to_usec)
     return 0;
 }
 
-/* Get the timeout interval used by the server to wait for an indication from a client */
-int modbus_get_indication_timeout(modbus_t *ctx, uint32_t *to_sec, uint32_t *to_usec)
-{
-    if (ctx == NULL) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    *to_sec = ctx->indication_timeout.tv_sec;
-    *to_usec = ctx->indication_timeout.tv_usec;
-    return 0;
-}
-
-int modbus_set_indication_timeout(modbus_t *ctx, uint32_t to_sec, uint32_t to_usec)
-{
-    /* Indication timeout can be disabled when both values are zero */
-    if (ctx == NULL || to_usec > 999999) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    ctx->indication_timeout.tv_sec = to_sec;
-    ctx->indication_timeout.tv_usec = to_usec;
-    return 0;
-}
-
 int modbus_get_header_length(modbus_t *ctx)
 {
     if (ctx == NULL) {
@@ -1761,7 +1713,7 @@ int modbus_set_debug(modbus_t *ctx, int flag)
 /* Allocates 4 arrays to store bits, input bits, registers and inputs
    registers. The pointers are stored in modbus_mapping structure.
 
-   The modbus_mapping_new_start_address() function shall return the new allocated
+   The modbus_mapping_new_ranges() function shall return the new allocated
    structure if successful. Otherwise it shall return NULL and set errno to
    ENOMEM. */
 modbus_mapping_t* modbus_mapping_new_start_address(
@@ -1907,3 +1859,218 @@ size_t strlcpy(char *dest, const char *src, size_t dest_size)
     return (s - src - 1); /* count does not include NUL */
 }
 #endif
+
+/**
+ * Take a request received from a master context, pass it to an slave context and then
+ * send the confirmation back to the master.
+ */
+int modbus_proxy(modbus_t* master_ctx, modbus_t* slave_ctx, uint8_t* master_req,
+                 int master_req_length)
+{
+    int offset = master_ctx->backend->header_length;
+    int slave = master_req[offset - 1];
+    int debug = master_ctx->debug || slave_ctx->debug;
+
+    /* Set slave address */
+    modbus_set_slave(slave_ctx, slave);
+
+    /* Translate request to the slave */
+    int function = master_req[offset++];
+
+    int addr = ((int) master_req[offset++] << 8);
+    addr |= ((int) master_req[offset++]);
+
+    int nb = ((int) master_req[offset++] << 8);
+    nb |= ((int) master_req[offset++]);
+
+    uint8_t buf[MAX_MESSAGE_LENGTH];
+
+    int buf_length = slave_ctx->backend->build_request_basis(slave_ctx, function, addr, nb, buf);
+
+    /* Copy the remaining PDU to the request */
+    int l = master_req_length - offset - master_ctx->backend->checksum_length;
+    memcpy(buf + buf_length, master_req + offset, l);
+    buf_length += l;
+
+    /* Send the request to the slave */
+    if (send_msg(slave_ctx, buf, buf_length) < 0) {
+	if(debug) fprintf( stderr, "Unable to send message\n" );
+        modbus_reply_exception(master_ctx, master_req, MODBUS_EXCEPTION_GATEWAY_PATH);
+        return -1;
+    }
+
+    /* Receive the response */
+    uint8_t rsp[MAX_MESSAGE_LENGTH];
+    int rsp_length = _modbus_receive_msg(slave_ctx, rsp, MSG_CONFIRMATION);
+    if (rsp_length < 0) {
+        if (errno == ETIMEDOUT) {
+	    if(debug) fprintf( stderr, "Response timeout\n" );
+            modbus_reply_exception(master_ctx, master_req, MODBUS_EXCEPTION_GATEWAY_TARGET);
+	} else {
+	    if(debug) fprintf( stderr, "Response bad\n" );
+            modbus_reply_exception(master_ctx, master_req, MODBUS_EXCEPTION_GATEWAY_PATH);
+	}
+        return -1;
+    }
+
+    /* Check response in backend */
+    if (slave_ctx->backend->pre_check_confirmation(slave_ctx, buf, rsp, rsp_length) < 0) {
+	if(debug) fprintf( stderr, "Backend response bad\n" );
+        modbus_reply_exception(master_ctx, master_req, MODBUS_EXCEPTION_GATEWAY_TARGET);
+        return -1;
+    }
+
+    /* Translate response to master */
+    offset = slave_ctx->backend->header_length;
+    sft_t sft;
+    sft.slave = rsp[offset - 1];
+    sft.function = rsp[offset];
+    sft.t_id = master_ctx->backend->prepare_response_tid(master_req, &master_req_length);
+    buf_length = master_ctx->backend->build_response_basis(&sft, buf);
+    /* Copy the remaining response data: PDU - function */
+    l = rsp_length - offset - slave_ctx->backend->checksum_length - 1;
+    memcpy(buf + buf_length, rsp + offset + 1, l);
+    buf_length += l;
+
+    /* Send response to master */
+    return send_msg(master_ctx, buf, buf_length);
+}
+
+
+/* Waits a raw response from a modbus server or a request from a modbus client.
+   This function blocks if there is no replies (3 timeouts).
+
+   The function shall return the number of received characters and the received
+   message in an array of uint8_t if successful. Otherwise it shall return -1
+   and errno is set to one of the values defined below:
+   - ECONNRESET
+   - EMBBADDATA
+   - EMBUNKEXC
+   - ETIMEDOUT
+   - read() or recv() error codes
+*/
+
+static int _modbus_receive_raw_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
+{
+    int rc = 0;
+    fd_set rset;
+    struct timeval tv;
+    struct timeval *p_tv;
+    int length_to_read;
+    int msg_length = 0;
+    _step_t step = _STEP_FUNCTION;
+
+    if (ctx->debug) {
+        if (msg_type == MSG_INDICATION) {
+            printf("Waiting for a raw indication...\n");
+        } else {
+            printf("Waiting for a raw confirmation...\n");
+        }
+    }
+
+    /* Add a file descriptor to the set */
+    FD_ZERO(&rset);
+    FD_SET(ctx->s, &rset);
+
+    length_to_read = ctx->backend->header_length + 1;
+
+    if (msg_type == MSG_INDICATION) {
+        /* Wait for a message, we don't know when the message will be
+         * received */
+        p_tv = NULL;
+    } else {
+        tv.tv_sec = ctx->response_timeout.tv_sec;
+        tv.tv_usec = ctx->response_timeout.tv_usec;
+        p_tv = &tv;
+    }
+
+    while (rc != -1) {
+        rc = ctx->backend->select(ctx, &rset, p_tv, length_to_read);
+        if (rc == -1) {
+            /* Timeout at end of msg */
+            if(step == _STEP_DATA && errno == ETIMEDOUT){
+                break;
+            }
+            _error_print(ctx, "select");
+            if (ctx->error_recovery & MODBUS_ERROR_RECOVERY_LINK) {
+                int saved_errno = errno;
+
+                if (errno == ETIMEDOUT) {
+                    _sleep_response_timeout(ctx);
+                    modbus_flush(ctx);
+                } else if (errno == EBADF) {
+                    modbus_close(ctx);
+                    modbus_connect(ctx);
+                }
+                errno = saved_errno;
+            }
+            return -1;
+        }
+
+        rc = ctx->backend->recv(ctx, msg + msg_length, length_to_read);
+        if (rc == 0) {
+            errno = ECONNRESET;
+            rc = -1;
+        }
+
+        if (rc == -1) {
+            _error_print(ctx, "read");
+            if ((ctx->error_recovery & MODBUS_ERROR_RECOVERY_LINK) &&
+                (errno == ECONNRESET || errno == ECONNREFUSED ||
+                 errno == EBADF)) {
+                int saved_errno = errno;
+                modbus_close(ctx);
+                modbus_connect(ctx);
+                /* Could be removed by previous calls */
+                errno = saved_errno;
+            }
+            return -1;
+        }
+
+        /* Display the hex code of each character received */
+        if (ctx->debug) {
+            int i;
+            for (i=0; i < rc; i++)
+                printf("<%.2X>", msg[msg_length + i]);
+        }
+
+        /* Sums bytes received */
+        msg_length += rc;
+
+        if(step == _STEP_FUNCTION){
+            /* Set byte timeout */
+            if (ctx->byte_timeout.tv_sec > 0 || ctx->byte_timeout.tv_usec > 0) {
+                tv.tv_sec = ctx->byte_timeout.tv_sec;
+                tv.tv_usec = ctx->byte_timeout.tv_usec;
+                p_tv = &tv;
+            }
+            /* Read one byte */
+            length_to_read = 1;
+            /* Data step */
+            step = _STEP_DATA;
+        }
+    }
+
+    if (ctx->debug)
+        printf("\n");
+
+    return ctx->backend->check_integrity(ctx, msg, msg_length);
+}
+
+/* Receives the raw confirmation.
+
+   The function shall store the read response in rsp and return the number of
+   values (bits or words). Otherwise, its shall return -1 and errno is set.
+
+   The function doesn't check the confirmation is the expected response to the
+   initial request.
+*/
+int modbus_receive_raw_confirmation(modbus_t *ctx, uint8_t *rsp)
+{
+    if (ctx == NULL) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    return _modbus_receive_raw_msg(ctx, rsp, MSG_CONFIRMATION);
+}
