@@ -5,6 +5,7 @@ Uploaders: Ivo De Decker <ivodd@debian.org>
 Standards-Version: 4.4.1
 Section: libs
 Build-Depends: debhelper-compat (= 12), asciidoc, xmlto, psmisc
+Rules-Requires-Root: no
 Homepage: http://libmodbus.org/
 Vcs-Git: https://salsa.debian.org/debian/libmodbus.git
 Vcs-Browser: https://salsa.debian.org/debian/libmodbus
