@@ -1,10 +1,16 @@
 libmodbus (3.1.6-2) unstable; urgency=medium
 
   [ Kun-Hung Tsai (蔡昆宏) ]
-  * d/test
+  * d/tests
      - Fix library name error
 
- -- Kun-Hung Tsai (蔡昆宏) <moonape1226@gmail.com>  Sat, 31 Aug 2019 15:50:01 +0800
+  [ SZ Lin (林上智) ]
+  * d/control:
+    - Bump Standards-Version to 4.4.1
+    - Add Rules-Requires-Root: no
+    - Use debhelper-compat (= 12) in build-dependency to replace d/compat
+
+ -- SZ Lin (林上智) <szlin@debian.org>  Mon, 09 Dec 2019 15:04:49 +0800
 
 libmodbus (3.1.6-1) unstable; urgency=high
 
