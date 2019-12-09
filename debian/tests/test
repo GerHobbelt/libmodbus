@@ -6,7 +6,7 @@
 set -e
 
 echo "run: Check if library file exist"
-if /sbin/ldconfig -p | grep libmodbus5
+if /sbin/ldconfig -p | grep libmodbus
 then
     echo "run: Found libary"
 else

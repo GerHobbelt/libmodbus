@@ -1,3 +1,11 @@
+libmodbus (3.1.6-2) unstable; urgency=medium
+
+  [ Kun-Hung Tsai (蔡昆宏) ]
+  * d/test
+     - Fix library name error
+
+ -- Kun-Hung Tsai (蔡昆宏) <moonape1226@gmail.com>  Sat, 31 Aug 2019 15:50:01 +0800
+
 libmodbus (3.1.6-1) unstable; urgency=high
 
   [ Kun-Hung Tsai (蔡昆宏) ]
