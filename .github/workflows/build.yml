@@ -3,11 +3,11 @@ name: Build C/C++ CI
 on:
   push:
     branches:
-      - main
+      - master
       - cicd
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build-libmodbus:
