@@ -1,3 +1,4 @@
+/* tests/unit-test.h.  Generated from unit-test.h.in by configure.  */
 /*
  * Copyright © Stéphane Raimbault <stephane.raimbault@gmail.com>
  *
@@ -8,8 +9,8 @@
 #define _UNIT_TEST_H_
 
 /* Constants defined by configure.ac */
-#define HAVE_INTTYPES_H @HAVE_INTTYPES_H@
-#define HAVE_STDINT_H @HAVE_STDINT_H@
+#define HAVE_INTTYPES_H 1
+#define HAVE_STDINT_H 1
 
 // clang-format off
 #ifdef HAVE_INTTYPES_H
