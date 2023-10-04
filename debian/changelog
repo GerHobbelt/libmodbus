@@ -1,3 +1,17 @@
+libmodbus (3.1.10-1) unstable; urgency=medium
+
+  * Import new upstream release
+  * Update symbol table
+  * Remove all Debian in-house patches
+  * Update copyright content
+  * d/*.{docs, manpages}
+    - Update the content to accommodate the new release
+  * d/control:
+    - Bump debhelper-compat to 13
+    - Bump Standards-Version to 4.6.2
+
+ -- SZ Lin (林上智) <szlin@debian.org>  Wed, 04 Oct 2023 23:00:30 +0800
+
 libmodbus (3.1.6-2.1) unstable; urgency=medium
 
   * Non-maintainer upload.
