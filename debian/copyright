@@ -5,14 +5,14 @@ Source: http://www.libmodbus.org/
 
 Files: *
 Copyright:
-  2008-2014 Stéphane Raimbault <stephane.raimbault@gmail.com>
+  2008-2023 Stéphane Raimbault <stephane.raimbault@gmail.com>
 License: LGPL-2.1+
 
 Files: debian/*
 Copyright:
   2008-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
   2011-2014 Ivo De Decker <ivodd@debian.org>
-  2018 SZ Lin (林上智) <szlin@debian.org>
+  2018-2023 SZ Lin (林上智) <szlin@debian.org>
 License: LGPL-2.1+
 
 Files:tests/bandwidth-client.c
