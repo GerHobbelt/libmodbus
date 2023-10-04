@@ -11,6 +11,8 @@ libmodbus.so.5 libmodbus5 #MINVER#
  libmodbus_version_minor@Base 3.0.2
  modbus_close@Base 3.0.2
  modbus_connect@Base 3.0.2
+ modbus_disable_quirks@Base 3.1.10
+ modbus_enable_quirks@Base 3.1.10
  modbus_flush@Base 3.0.2
  modbus_free@Base 3.0.2
  modbus_get_byte_from_bits@Base 3.0.2
