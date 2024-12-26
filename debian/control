@@ -2,7 +2,7 @@ Source: libmodbus
 Priority: optional
 Maintainer: SZ Lin (林上智) <szlin@debian.org>
 Uploaders: Ivo De Decker <ivodd@debian.org>
-Standards-Version: 4.6.2
+Standards-Version: 4.7.0
 Section: libs
 Build-Depends: debhelper-compat (= 13), asciidoc, xmlto, psmisc
 Rules-Requires-Root: no
