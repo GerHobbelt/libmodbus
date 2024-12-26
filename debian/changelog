@@ -1,3 +1,15 @@
+libmodbus (3.1.11-1) unstable; urgency=medium
+
+  * Import new upstream release
+  * d/libmodbus5.symbols
+    - Update symbols for upstream release
+  * d/control:
+    - Bump Standards-Version to 4.7.0
+  * Add Salsa-ci file
+  * Add patch to preserve CFLAGS and related parameters
+
+ -- SZ Lin (林上智) <szlin@debian.org>  Fri, 27 Dec 2024 17:29:12 +0800
+
 libmodbus (3.1.10-2) unstable; urgency=medium
 
   * Fix FTBFS symbol issue (Closes: #1071325)
