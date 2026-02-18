@@ -385,6 +385,13 @@ int _modbus_receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
 
     /* Add a file descriptor to the set */
     FD_ZERO(&rset);
+    if (ctx->s < 0 || ctx->s >= FD_SETSIZE) {
+        if (ctx->debug) {
+            fprintf(stderr, "ERROR Invalid socket descriptor %d\n", ctx->s);
+        }
+        errno = EINVAL;
+        return -1;
+    }
     FD_SET(ctx->s, &rset);
 
     /* We need to analyse the message step by step.  At the first step, we want
@@ -1079,11 +1086,12 @@ int modbus_reply(modbus_t *ctx,
         rsp[byte_count_pos] = rsp_length - byte_count_pos - 1;
     } break;
     case MODBUS_FC_READ_EXCEPTION_STATUS:
-        if (ctx->debug) {
-            fprintf(stderr, "FIXME Not implemented\n");
-        }
-        errno = ENOPROTOOPT;
-        return -1;
+        rsp_length = response_exception(ctx,
+                                        &sft,
+                                        MODBUS_EXCEPTION_ILLEGAL_FUNCTION,
+                                        rsp,
+                                        TRUE,
+                                        "Unsupported function: READ EXCEPTION STATUS (0x07)\n");
         break;
     case MODBUS_FC_MASK_WRITE_REGISTER: {
         int mapping_address = address - mb_mapping->start_registers;
@@ -1295,7 +1303,7 @@ int modbus_read_bits(modbus_t *ctx, int addr, int nb, uint8_t *dest)
                     nb,
                     MODBUS_MAX_READ_BITS);
         }
-        errno = EMBMDATA;
+        errno = EMBXILVAL;
         return -1;
     }
 
@@ -1324,7 +1332,7 @@ int modbus_read_input_bits(modbus_t *ctx, int addr, int nb, uint8_t *dest)
                     nb,
                     MODBUS_MAX_READ_BITS);
         }
-        errno = EMBMDATA;
+        errno = EMBXILVAL;
         return -1;
     }
 
@@ -1351,7 +1359,7 @@ static int read_registers(modbus_t *ctx, int function, int addr, int nb, uint16_
                     nb,
                     MODBUS_MAX_READ_REGISTERS);
         }
-        errno = EMBMDATA;
+        errno = EMBXILVAL;
         return -1;
     }
 
@@ -1399,7 +1407,7 @@ int modbus_read_registers(modbus_t *ctx, int addr, int nb, uint16_t *dest)
                     nb,
                     MODBUS_MAX_READ_REGISTERS);
         }
-        errno = EMBMDATA;
+        errno = EMBXILVAL;
         return -1;
     }
 
@@ -1424,7 +1432,7 @@ int modbus_read_input_registers(modbus_t *ctx, int addr, int nb, uint16_t *dest)
                     nb,
                     MODBUS_MAX_READ_REGISTERS);
         }
-        errno = EMBMDATA;
+        errno = EMBXILVAL;
         return -1;
     }
 
@@ -1508,7 +1516,7 @@ int modbus_write_bits(modbus_t *ctx, int addr, int nb, const uint8_t *src)
                     nb,
                     MODBUS_MAX_WRITE_BITS);
         }
-        errno = EMBMDATA;
+        errno = EMBXILVAL;
         return -1;
     }
 
@@ -1569,7 +1577,7 @@ int modbus_write_registers(modbus_t *ctx, int addr, int nb, const uint16_t *src)
                     nb,
                     MODBUS_MAX_WRITE_REGISTERS);
         }
-        errno = EMBMDATA;
+        errno = EMBXILVAL;
         return -1;
     }
 
@@ -1665,7 +1673,7 @@ int modbus_write_and_read_registers(modbus_t *ctx,
                     write_nb,
                     MODBUS_MAX_WR_WRITE_REGISTERS);
         }
-        errno = EMBMDATA;
+        errno = EMBXILVAL;
         return -1;
     }
 
@@ -1676,7 +1684,7 @@ int modbus_write_and_read_registers(modbus_t *ctx,
                     read_nb,
                     MODBUS_MAX_WR_READ_REGISTERS);
         }
-        errno = EMBMDATA;
+        errno = EMBXILVAL;
         return -1;
     }
     req_length = ctx->backend->build_request_basis(
