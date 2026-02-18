@@ -800,7 +800,16 @@ int modbus_reply(modbus_t *ctx,
     offset = ctx->backend->header_length;
     slave = req[offset - 1];
     function = req[offset];
-    address = (req[offset + 1] << 8) + req[offset + 2];
+
+    /* Some function codes (eg. FC_READ_EXCEPTION_STATUS, FC_REPORT_SLAVE_ID)
+       carry no address in the request PDU, so only read when available. Reading
+       them is safe as it fits within MODBUS_MAX_ADU_LENGTH, it's just for
+       coherency.
+    */
+    if (req_length >= (int) (offset + 3))
+        address = (req[offset + 1] << 8) + req[offset + 2];
+    else
+        address = 0;
 
     sft.slave = slave;
     sft.function = function;
@@ -1093,7 +1102,7 @@ int modbus_reply(modbus_t *ctx,
             uint16_t and = (req[offset + 3] << 8) + req[offset + 4];
             uint16_t or = (req[offset + 5] << 8) + req[offset + 6];
 
-            data = (data & and) | (or &(~and) );
+            data = (data & and) | (or & (~and));
             mb_mapping->tab_registers[mapping_address] = data;
 
             rsp_length = compute_response_length_from_request(ctx, (uint8_t *) req);
@@ -1274,12 +1283,12 @@ int modbus_read_bits(modbus_t *ctx, int addr, int nb, uint8_t *dest)
 {
     int rc;
 
-    if (ctx == NULL) {
+    if (ctx == NULL || dest == NULL) {
         errno = EINVAL;
         return -1;
     }
 
-    if (nb > MODBUS_MAX_READ_BITS) {
+    if (nb < 1 || nb > MODBUS_MAX_READ_BITS) {
         if (ctx->debug) {
             fprintf(stderr,
                     "ERROR Too many bits requested (%d > %d)\n",
@@ -1303,12 +1312,12 @@ int modbus_read_input_bits(modbus_t *ctx, int addr, int nb, uint8_t *dest)
 {
     int rc;
 
-    if (ctx == NULL) {
+    if (ctx == NULL || dest == NULL) {
         errno = EINVAL;
         return -1;
     }
 
-    if (nb > MODBUS_MAX_READ_BITS) {
+    if (nb < 1 || nb > MODBUS_MAX_READ_BITS) {
         if (ctx->debug) {
             fprintf(stderr,
                     "ERROR Too many discrete inputs requested (%d > %d)\n",
@@ -1378,12 +1387,12 @@ int modbus_read_registers(modbus_t *ctx, int addr, int nb, uint16_t *dest)
 {
     int status;
 
-    if (ctx == NULL) {
+    if (ctx == NULL || dest == NULL) {
         errno = EINVAL;
         return -1;
     }
 
-    if (nb > MODBUS_MAX_READ_REGISTERS) {
+    if (nb < 1 || nb > MODBUS_MAX_READ_REGISTERS) {
         if (ctx->debug) {
             fprintf(stderr,
                     "ERROR Too many registers requested (%d > %d)\n",
@@ -1403,12 +1412,12 @@ int modbus_read_input_registers(modbus_t *ctx, int addr, int nb, uint16_t *dest)
 {
     int status;
 
-    if (ctx == NULL) {
+    if (ctx == NULL || dest == NULL) {
         errno = EINVAL;
         return -1;
     }
 
-    if (nb > MODBUS_MAX_READ_REGISTERS) {
+    if (nb < 1 || nb > MODBUS_MAX_READ_REGISTERS) {
         if (ctx->debug) {
             fprintf(stderr,
                     "ERROR Too many input registers requested (%d > %d)\n",
@@ -1487,12 +1496,12 @@ int modbus_write_bits(modbus_t *ctx, int addr, int nb, const uint8_t *src)
     int pos = 0;
     uint8_t req[MAX_MESSAGE_LENGTH];
 
-    if (ctx == NULL) {
+    if (ctx == NULL || src == NULL) {
         errno = EINVAL;
         return -1;
     }
 
-    if (nb > MODBUS_MAX_WRITE_BITS) {
+    if (nb < 1 || nb > MODBUS_MAX_WRITE_BITS) {
         if (ctx->debug) {
             fprintf(stderr,
                     "ERROR Writing too many bits (%d > %d)\n",
@@ -1548,12 +1557,12 @@ int modbus_write_registers(modbus_t *ctx, int addr, int nb, const uint16_t *src)
     int byte_count;
     uint8_t req[MAX_MESSAGE_LENGTH];
 
-    if (ctx == NULL) {
+    if (ctx == NULL || src == NULL) {
         errno = EINVAL;
         return -1;
     }
 
-    if (nb > MODBUS_MAX_WRITE_REGISTERS) {
+    if (nb < 1 || nb > MODBUS_MAX_WRITE_REGISTERS) {
         if (ctx->debug) {
             fprintf(stderr,
                     "ERROR Trying to write to too many registers (%d > %d)\n",
