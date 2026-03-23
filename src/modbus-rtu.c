@@ -1,7 +1,7 @@
 /*
  * Copyright © 2001-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
  *
- * SPDX-License-Identifier: LGPL-2.1+
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 //#include <semaphore.h>
@@ -364,7 +364,7 @@ static int _modbus_rtu_pre_check_confirmation(modbus_t *ctx, const uint8_t *req,
     }
 }
 
-/* The check_crc16 function shall return 0 is the message is ignored and the
+/* The check_crc16 function shall return 0 if the message is ignored and the
    message length if the CRC is valid. Otherwise it shall return -1 and set
    errno to EMBADCRC. */
 static int _modbus_rtu_check_integrity(modbus_t *ctx, uint8_t *msg,
@@ -506,6 +506,9 @@ static int _modbus_rtu_connect(modbus_t *ctx)
         break;
     case 250000:
         dcb.BaudRate = 250000;
+        break;
+    case 256000:
+        dcb.BaudRate = 256000;
         break;
     case 460800:
         dcb.BaudRate = 460800;
@@ -853,7 +856,7 @@ static int _modbus_rtu_connect(modbus_t *ctx)
        ONCLR ant others needs OPOST to be enabled
     */
 
-    /* Raw ouput */
+    /* Raw output */
     tios.c_oflag &=~ OPOST;
 
     /* C_CC         Control characters
