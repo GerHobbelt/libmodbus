@@ -1,7 +1,7 @@
 /*
  * Copyright © 2001-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
  *
- * SPDX-License-Identifier: LGPL-2.1+
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  *
  * This library implements the Modbus protocol.
  * http://libmodbus.org/
@@ -207,7 +207,7 @@ static int send_msg(modbus_t *ctx, uint8_t *msg, int msg_length)
     return rc;
 }
 
-int modbus_send_raw_request(modbus_t *ctx, uint8_t *raw_req, int raw_req_length)
+int modbus_send_raw_request(modbus_t *ctx, const uint8_t *raw_req, int raw_req_length)
 {
     sft_t sft;
     uint8_t req[MAX_MESSAGE_LENGTH];
@@ -831,9 +831,10 @@ int modbus_reply(modbus_t *ctx, const uint8_t *req,
         break;
     case MODBUS_FC_WRITE_MULTIPLE_COILS: {
         int nb = (req[offset + 3] << 8) + req[offset + 4];
+        int nb_bits = req[offset + 5];
         int mapping_address = address - mb_mapping->start_bits;
 
-        if (nb < 1 || MODBUS_MAX_WRITE_BITS < nb) {
+        if (nb < 1 || MODBUS_MAX_WRITE_BITS < nb || nb_bits * 8 < nb) {
             /* May be the indication has been truncated on reading because of
              * invalid address (eg. nb is 0 but the request contains values to
              * write) so it's necessary to flush. */
@@ -862,9 +863,10 @@ int modbus_reply(modbus_t *ctx, const uint8_t *req,
         break;
     case MODBUS_FC_WRITE_MULTIPLE_REGISTERS: {
         int nb = (req[offset + 3] << 8) + req[offset + 4];
+        int nb_bytes = req[offset + 5];
         int mapping_address = address - mb_mapping->start_registers;
 
-        if (nb < 1 || MODBUS_MAX_WRITE_REGISTERS < nb) {
+        if (nb < 1 || MODBUS_MAX_WRITE_REGISTERS < nb || nb_bytes != nb * 2) {
             rsp_length = response_exception(
                 ctx, &sft, MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE, rsp, TRUE,
                 "Illegal number of values %d in write_registers (max %d)\n",
@@ -951,7 +953,7 @@ int modbus_reply(modbus_t *ctx, const uint8_t *req,
                 nb_write, nb, MODBUS_MAX_WR_WRITE_REGISTERS, MODBUS_MAX_WR_READ_REGISTERS);
         } else if (mapping_address < 0 ||
                    (mapping_address + nb) > mb_mapping->nb_registers ||
-                   mapping_address < 0 ||
+                   mapping_address_write < 0 ||
                    (mapping_address_write + nb_write) > mb_mapping->nb_registers) {
             rsp_length = response_exception(
                 ctx, &sft, MODBUS_EXCEPTION_ILLEGAL_DATA_ADDRESS, rsp, FALSE,
@@ -1128,7 +1130,7 @@ int modbus_read_input_bits(modbus_t *ctx, int addr, int nb, uint8_t *dest)
         return nb;
 }
 
-/* Reads the data from a remove device and put that data into an array */
+/* Reads the data from a remote device and put that data into an array */
 static int read_registers(modbus_t *ctx, int function, int addr, int nb,
                           uint16_t *dest)
 {
@@ -1227,7 +1229,7 @@ int modbus_read_input_registers(modbus_t *ctx, int addr, int nb,
 
 /* Write a value to the specified register of the remote device.
    Used by write_bit and write_register */
-static int write_single(modbus_t *ctx, int function, int addr, int value)
+static int write_single(modbus_t *ctx, int function, int addr, const uint16_t value)
 {
     int rc;
     int req_length;
@@ -1238,7 +1240,7 @@ static int write_single(modbus_t *ctx, int function, int addr, int value)
         return -1;
     }
 
-    req_length = ctx->backend->build_request_basis(ctx, function, addr, value, req);
+    req_length = ctx->backend->build_request_basis(ctx, function, addr, (int) value, req);
 
     rc = send_msg(ctx, req, req_length);
     if (rc > 0) {
@@ -1268,7 +1270,7 @@ int modbus_write_bit(modbus_t *ctx, int addr, int status)
 }
 
 /* Writes a value in one register of the remote device */
-int modbus_write_register(modbus_t *ctx, int addr, int value)
+int modbus_write_register(modbus_t *ctx, int addr, const uint16_t value)
 {
     if (ctx == NULL) {
         errno = EINVAL;
@@ -1395,7 +1397,7 @@ int modbus_mask_write_register(modbus_t *ctx, int addr, uint16_t and_mask, uint1
     int rc;
     int req_length;
     /* The request length can not exceed _MIN_REQ_LENGTH - 2 and 4 bytes to
-     * store the masks. The ugly substraction is there to remove the 'nb' value
+     * store the masks. The ugly subtraction is there to remove the 'nb' value
      * (2 bytes) which is not used. */
     uint8_t req[_MIN_REQ_LENGTH + 2];
 
