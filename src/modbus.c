@@ -1259,7 +1259,7 @@ int modbus_reply_exception(modbus_t *ctx, const uint8_t *req, unsigned int excep
     int rsp_length;
     sft_t sft;
 
-    if (ctx == NULL) {
+    if (ctx == NULL || req == NULL) {
         errno = EINVAL;
         return -1;
     }
@@ -1802,6 +1802,11 @@ int modbus_mask_write_register(modbus_t *ctx,
      * (2 bytes) which is not used. */
     uint8_t req[_MIN_REQ_LENGTH + 2];
 
+    if (ctx == NULL) {
+        errno = EINVAL;
+        return -1;
+    }
+
     req_length = ctx->backend->build_request_basis(
         ctx, MODBUS_FC_MASK_WRITE_REGISTER, addr, 0, req);
 
@@ -1846,7 +1851,7 @@ int modbus_write_and_read_registers(modbus_t *ctx,
     uint8_t req[MAX_MESSAGE_LENGTH];
     uint8_t rsp[MAX_MESSAGE_LENGTH];
 
-    if (ctx == NULL) {
+    if (ctx == NULL || src == NULL || dest == NULL || write_nb < 1 || read_nb < 1) {
         errno = EINVAL;
         return -1;
     }
@@ -1917,7 +1922,7 @@ int modbus_report_slave_id(modbus_t *ctx, int max_dest, uint8_t *dest)
     int req_length;
     uint8_t req[_MIN_REQ_LENGTH];
 
-    if (ctx == NULL || max_dest <= 0) {
+    if (ctx == NULL || dest == NULL || max_dest <= 0) {
         errno = EINVAL;
         return -1;
     }
