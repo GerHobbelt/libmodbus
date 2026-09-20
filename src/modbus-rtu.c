@@ -244,13 +244,22 @@ static void _modbus_rtu_ioctl_rts(modbus_t *ctx, int on)
     int fd = ctx->s;
     int flags;
 
-    ioctl(fd, TIOCMGET, &flags);
+    if (ioctl(fd, TIOCMGET, &flags) == -1) {
+        if (ctx->debug) {
+            fprintf(stderr, "ERROR Can't get RTS line state (%s)\n", strerror(errno));
+        }
+        return;
+    }
     if (on) {
         flags |= TIOCM_RTS;
     } else {
         flags &= ~TIOCM_RTS;
     }
-    ioctl(fd, TIOCMSET, &flags);
+    if (ioctl(fd, TIOCMSET, &flags) == -1) {
+        if (ctx->debug) {
+            fprintf(stderr, "ERROR Can't set RTS line state (%s)\n", strerror(errno));
+        }
+    }
 }
 #endif
 
@@ -272,12 +281,22 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
             fprintf(stderr, "Sending request using RTS signal\n");
         }
 
+        uint64_t total_delay;
+
         ctx_rtu->set_rts(ctx, ctx_rtu->rts == MODBUS_RTU_RTS_UP);
         usleep(ctx_rtu->rts_delay);
 
         size = write(ctx->s, req, req_length);
 
-        usleep(ctx_rtu->onebyte_time * req_length + ctx_rtu->rts_delay);
+        /* Compute the post-send delay in a wide unsigned type to avoid the
+           signed overflow that occurs with a very low baud (large
+           onebyte_time) and a large request, then clamp to a sane maximum. */
+        total_delay = (uint64_t) ctx_rtu->onebyte_time * (uint64_t) req_length +
+                      (uint64_t) ctx_rtu->rts_delay;
+        if (total_delay > 1000000000ULL) {
+            total_delay = 1000000000ULL;
+        }
+        usleep((useconds_t) total_delay);
         ctx_rtu->set_rts(ctx, ctx_rtu->rts != MODBUS_RTU_RTS_UP);
 
         return size;
@@ -666,10 +685,20 @@ static int _modbus_rtu_connect(modbus_t *ctx)
 
     /* Save */
 #ifdef HAVE_STRUCT_TERMIOS2
-    ioctl(ctx->s, TCGETS2, &ctx_rtu->old_tios);
+    if (ioctl(ctx->s, TCGETS2, &ctx_rtu->old_tios) < 0) {
 #else
-    tcgetattr(ctx->s, &ctx_rtu->old_tios);
+    if (tcgetattr(ctx->s, &ctx_rtu->old_tios) < 0) {
 #endif
+        if (ctx->debug) {
+            fprintf(stderr,
+                    "ERROR Can't save the termios settings of %s (%s)\n",
+                    ctx_rtu->device,
+                    strerror(errno));
+        }
+        close(ctx->s);
+        ctx->s = -1;
+        return -1;
+    }
 
     memset(&tios, 0, sizeof(tios));
 
@@ -1145,13 +1174,21 @@ static void _modbus_rtu_close(modbus_t *ctx)
     }
 #elif defined(HAVE_STRUCT_TERMIOS2)
     if (ctx->s >= 0) {
-        ioctl(ctx->s, TCSETS2, &ctx_rtu->old_tios);
+        if (ioctl(ctx->s, TCSETS2, &ctx_rtu->old_tios) < 0 && ctx->debug) {
+            fprintf(stderr,
+                    "ERROR Can't restore the termios settings (%s)\n",
+                    strerror(errno));
+        }
         close(ctx->s);
         ctx->s = -1;
     }
 #else
     if (ctx->s >= 0) {
-        tcsetattr(ctx->s, TCSANOW, &ctx_rtu->old_tios);
+        if (tcsetattr(ctx->s, TCSANOW, &ctx_rtu->old_tios) < 0 && ctx->debug) {
+            fprintf(stderr,
+                    "ERROR Can't restore the termios settings (%s)\n",
+                    strerror(errno));
+        }
         close(ctx->s);
         ctx->s = -1;
     }
@@ -1262,8 +1299,8 @@ modbus_new_rtu(const char *device, int baud, char parity, int data_bit, int stop
     }
 
     /* Check baud argument */
-    if (baud == 0) {
-        fprintf(stderr, "The baud rate value must not be zero\n");
+    if (baud <= 0) {
+        fprintf(stderr, "The baud rate value must be strictly positive\n");
         errno = EINVAL;
         return NULL;
     }
