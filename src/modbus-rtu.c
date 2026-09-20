@@ -296,7 +296,14 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
         if (total_delay > 1000000000ULL) {
             total_delay = 1000000000ULL;
         }
-        usleep((useconds_t) total_delay);
+        /* POSIX allows usleep() to fail with EINVAL for values >= 1 second
+           so sleep in chunks below that limit */
+        while (total_delay > 0) {
+            useconds_t delay =
+                (total_delay > 999999ULL) ? 999999 : (useconds_t) total_delay;
+            usleep(delay);
+            total_delay -= delay;
+        }
         ctx_rtu->set_rts(ctx, ctx_rtu->rts != MODBUS_RTU_RTS_UP);
 
         return size;
@@ -1304,6 +1311,20 @@ modbus_new_rtu(const char *device, int baud, char parity, int data_bit, int stop
     /* Check baud argument */
     if (baud <= 0) {
         fprintf(stderr, "The baud rate value must be strictly positive\n");
+        errno = EINVAL;
+        return NULL;
+    }
+
+    /* Check data_bit argument */
+    if (data_bit < 5 || data_bit > 8) {
+        fprintf(stderr, "The number of data bits must be between 5 and 8\n");
+        errno = EINVAL;
+        return NULL;
+    }
+
+    /* Check stop_bit argument */
+    if (stop_bit != 1 && stop_bit != 2) {
+        fprintf(stderr, "The number of stop bits must be 1 or 2\n");
         errno = EINVAL;
         return NULL;
     }
