@@ -26,6 +26,10 @@
 /* Internal use */
 #define MSG_LENGTH_UNDEFINED -1
 
+/* The Modbus address space is 16-bit, so a mapping table cannot hold more
+   than 65536 entries. */
+#define MODBUS_MAX_TABLE_SIZE 65536
+
 /* Exported version */
 const unsigned int libmodbus_version_major = LIBMODBUS_VERSION_MAJOR;
 const unsigned int libmodbus_version_minor = LIBMODBUS_VERSION_MINOR;
@@ -2037,7 +2041,7 @@ int modbus_get_socket(modbus_t *ctx)
 /* Get the timeout interval used to wait for a response */
 int modbus_get_response_timeout(modbus_t *ctx, uint32_t *to_sec, uint32_t *to_usec)
 {
-    if (ctx == NULL) {
+    if (ctx == NULL || to_sec == NULL || to_usec == NULL) {
         errno = EINVAL;
         return -1;
     }
@@ -2062,7 +2066,7 @@ int modbus_set_response_timeout(modbus_t *ctx, uint32_t to_sec, uint32_t to_usec
 /* Get the timeout interval between two consecutive bytes of a message */
 int modbus_get_byte_timeout(modbus_t *ctx, uint32_t *to_sec, uint32_t *to_usec)
 {
-    if (ctx == NULL) {
+    if (ctx == NULL || to_sec == NULL || to_usec == NULL) {
         errno = EINVAL;
         return -1;
     }
@@ -2089,7 +2093,7 @@ int modbus_set_byte_timeout(modbus_t *ctx, uint32_t to_sec, uint32_t to_usec)
  */
 int modbus_get_indication_timeout(modbus_t *ctx, uint32_t *to_sec, uint32_t *to_usec)
 {
-    if (ctx == NULL) {
+    if (ctx == NULL || to_sec == NULL || to_usec == NULL) {
         errno = EINVAL;
         return -1;
     }
@@ -2200,6 +2204,15 @@ modbus_mapping_t *modbus_mapping_new_start_address(unsigned int start_bits,
 {
     modbus_mapping_t *mb_mapping;
 
+    /* Reject dimensions larger than the addressable space to avoid excessively
+       large allocations driven by untrusted configuration. */
+    if (nb_bits > MODBUS_MAX_TABLE_SIZE || nb_input_bits > MODBUS_MAX_TABLE_SIZE ||
+        nb_registers > MODBUS_MAX_TABLE_SIZE ||
+        nb_input_registers > MODBUS_MAX_TABLE_SIZE) {
+        errno = EINVAL;
+        return NULL;
+    }
+
     mb_mapping = (modbus_mapping_t *) malloc(sizeof(modbus_mapping_t));
     if (mb_mapping == NULL) {
         return NULL;
@@ -2211,7 +2224,6 @@ modbus_mapping_t *modbus_mapping_new_start_address(unsigned int start_bits,
     if (nb_bits == 0) {
         mb_mapping->tab_bits = NULL;
     } else {
-        /* Negative number raises a POSIX error */
         mb_mapping->tab_bits = (uint8_t *) malloc(nb_bits * sizeof(uint8_t));
         if (mb_mapping->tab_bits == NULL) {
             free(mb_mapping);
@@ -2277,6 +2289,14 @@ modbus_mapping_t *modbus_mapping_new(int nb_bits,
                                      int nb_registers,
                                      int nb_input_registers)
 {
+    /* Reject negative counts: they would otherwise be converted to very large
+       unsigned dimensions and drive huge allocations. */
+    if (nb_bits < 0 || nb_input_bits < 0 || nb_registers < 0 ||
+        nb_input_registers < 0) {
+        errno = EINVAL;
+        return NULL;
+    }
+
     return modbus_mapping_new_start_address(
         0, nb_bits, 0, nb_input_bits, 0, nb_registers, 0, nb_input_registers);
 }
